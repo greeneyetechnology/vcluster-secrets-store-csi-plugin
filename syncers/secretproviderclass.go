@@ -1,6 +1,8 @@
 package syncers
 
 import (
+	"k8s.io/apimachinery/pkg/util/json"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 	secretsstorev1 "sigs.k8s.io/secrets-store-csi-driver/apis/v1"
 	"github.com/loft-sh/vcluster-sdk/plugin"
 	"github.com/loft-sh/vcluster-sdk/syncer"

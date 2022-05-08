@@ -24,7 +24,8 @@ hooks:
       fi
       
       # Install car crd
-      kubectl apply -f manifests/crds.yaml
+      # helm repo add secrets-store-csi-driver https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts
+      # helm install csi-secrets-store-provider-azure/csi-secrets-store-provider-azure --generate-name -n default
 deployments:
   - name: vcluster
     helm:
