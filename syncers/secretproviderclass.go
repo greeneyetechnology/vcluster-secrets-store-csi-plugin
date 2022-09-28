@@ -1,17 +1,17 @@
 package syncers
 
 import (
-	"k8s.io/apimachinery/pkg/util/json"
-	"sigs.k8s.io/controller-runtime/pkg/log"
-	secretsstorev1 "sigs.k8s.io/secrets-store-csi-driver/apis/v1"
 	"github.com/loft-sh/vcluster-sdk/plugin"
 	"github.com/loft-sh/vcluster-sdk/syncer"
 	synccontext "github.com/loft-sh/vcluster-sdk/syncer/context"
 	"github.com/loft-sh/vcluster-sdk/syncer/translator"
 	"github.com/loft-sh/vcluster-sdk/translate"
 	"k8s.io/apimachinery/pkg/api/equality"
+	"k8s.io/apimachinery/pkg/util/json"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/log"
+	secretsstorev1 "sigs.k8s.io/secrets-store-csi-driver/apis/v1"
 )
 
 func init() {
@@ -29,10 +29,18 @@ type secretStoreSyncer struct {
 	translator.NamespacedTranslator
 }
 
+func (s *secretStoreSyncer) Name() string {
+	return "vcluster-secrets-store-csi-plugin"
+}
+
 var _ syncer.Initializer = &secretStoreSyncer{}
 
 func (s *secretStoreSyncer) Init(ctx *synccontext.RegisterContext) error {
-	return translate.EnsureCRDFromPhysicalCluster(ctx.Context, ctx.PhysicalManager.GetConfig(), ctx.VirtualManager.GetConfig(), secretsstorev1.SchemeGroupVersion.WithKind("SecretProviderClass"))
+	return translate.EnsureCRDFromPhysicalCluster(
+		ctx.Context, ctx.PhysicalManager.GetConfig(),
+		ctx.VirtualManager.GetConfig(),
+		secretsstorev1.SchemeGroupVersion.WithKind("SecretProviderClass"),
+	)
 }
 
 func (s *secretStoreSyncer) SyncDown(ctx *synccontext.SyncContext, vObj client.Object) (ctrl.Result, error) {
@@ -72,7 +80,9 @@ func (s *secretStoreSyncer) translateUpdate(pObj, vObj *secretsstorev1.SecretPro
 
 	newObj := vObj.DeepCopy()
 	newObj.Spec.SecretObjects = s.translateSecretsToPhysical(vObj)
-
+	log.Log.Info("test newObj.Spec.SecretObjects")
+	o, err := json.Marshal(newObj.Spec.SecretObjects)
+	log.Log.Info(string(o), err)
 	// check spec
 	if !equality.Semantic.DeepEqual(newObj.Spec, pObj.Spec) {
 		updated = newIfNil(updated, pObj)

@@ -15,3 +15,6 @@
 # vendor/
 .devspace/
 vendor/
+
+# Ignore DevSpace cache and log folder
+.devspace/

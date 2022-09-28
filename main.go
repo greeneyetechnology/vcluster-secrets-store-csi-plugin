@@ -6,7 +6,8 @@ import (
 )
 
 func main() {
-	ctx := plugin.MustInit("secrets-store-csi-plugin")
+	ctx := plugin.MustInit()
 	plugin.MustRegister(syncers.NewSecretStoreSyncer(ctx))
+	plugin.MustRegister(syncers.NewPodHook())
 	plugin.MustStart()
 }
